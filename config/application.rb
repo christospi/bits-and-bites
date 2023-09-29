@@ -1,6 +1,6 @@
-require_relative "boot"
+require_relative 'boot'
 
-require "rails/all"
+require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -18,5 +18,12 @@ module BitsAndBites
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.generators.after_generate do |files|
+      parsable_files = files.filter { |file| file.end_with?('.rb') }
+      unless parsable_files.empty?
+        system("bundle exec rubocop -A --only Style/StringLiterals --fail-level=E #{parsable_files.shelljoin}", exception: true)
+      end
+    end
   end
 end
