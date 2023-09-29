@@ -60,6 +60,8 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-doc'
   gem 'pry-rails'
+
+  gem 'rspec-rails', '~> 6.0', '>= 6.0.3'
 end
 
 group :development do
