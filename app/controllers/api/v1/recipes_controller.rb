@@ -4,11 +4,16 @@ class Api::V1::RecipesController < ApplicationController
   def index
     recipes = Recipe.all.order(:id)
 
-    render json: recipes
+    render json: {
+      recipes: ActiveModel::Serializer::CollectionSerializer.new(
+        recipes,
+        each_serializer: RecipeSerializer
+      )
+    }
   end
 
   def show
-    render json: @recipe
+    render json: @recipe, serializer: RecipeSerializer
   end
 
   private
