@@ -10,7 +10,7 @@ export default () => (
           Transforming bits to delicious bites since 2023®
         </p>
         <Link
-          to="#"
+          to="/recipes"
           className="d-flex mt-4 btn btn-lg custom-button align-items-center justify-content-center"
           role="button"
         >

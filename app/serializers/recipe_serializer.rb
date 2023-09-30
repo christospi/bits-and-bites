@@ -6,4 +6,8 @@ class RecipeSerializer < ActiveModel::Serializer
     data = super
     data.deep_transform_keys { |key| key.to_s.camelize(:lower) }
   end
+
+  def image_url
+    object.image_url || ActionController::Base.helpers.asset_path('recipe/image.webp')
+  end
 end
