@@ -4,19 +4,23 @@ import { Link, useNavigate } from "react-router-dom";
 const Recipes = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
-    const url = "/api/v1/recipes/index";
+    const url = `/api/v1/recipes/index?page=${currentPage}`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
         setRecipes(data.recipes);
+        setCurrentPage(data.meta.currentPage);
+        setTotalPages(data.meta.totalPages);
       })
       .catch(() => navigate("/"));
-  }, []);
+  }, [currentPage]);
 
   const allRecipes = recipes.map((recipe, index) => (
-    <div key={index} className="col-md-6 col-lg-4">
+    <div key={index} className="col-md-6 col-lg-3">
       <div className="card mb-4">
         <img
           src={recipe.imageUrl}
@@ -69,6 +73,31 @@ const Recipes = () => {
             {recipes.length > 0 ? allRecipes : noRecipes}
           </div>
         </main>
+      </div>
+      <div className="pagination-controls">
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={() =>
+            setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+          }
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+
+        <span className="mx-3">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={() =>
+            setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
     </>
   );
