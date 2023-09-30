@@ -25,5 +25,12 @@ module BitsAndBites
         system("bundle exec rubocop -A --only Style/StringLiterals --fail-level=E #{parsable_files.shelljoin}", exception: true)
       end
     end
+
+    # Always convert between snake_case and camelCase for our API
+    excluded_routes = ->(env) { !env['PATH_INFO'].match(%r{^/api}) }
+    config.middleware.use OliveBranch::Middleware,
+                          inflection: 'camel',
+                          exclude_params: excluded_routes,
+                          exclude_response: excluded_routes
   end
 end
