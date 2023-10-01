@@ -7,4 +7,6 @@ class Recipe < ApplicationRecord
   validates :cook_time_in_minutes, numericality: { in: 0..1440 }
   validates :prep_time_in_minutes, numericality: { in: 0..1440 }
   validates :ratings, numericality: { in: 0..5 }, allow_nil: true
+
+  scope :includes_ingredients, -> { includes(recipe_ingredients: :ingredient) }
 end
