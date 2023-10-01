@@ -4,7 +4,8 @@ class Api::V1::RecipesController < ApplicationController
   before_action :fetch_recipe, only: [:show]
 
   def index
-    recipes = Recipe.page(params[:page]).per(PAGE_SIZE)
+    recipes = Recipe.includes(:recipe_ingredients, :ingredients).
+      page(params[:page]).per(PAGE_SIZE)
 
     render json: {
       recipes: ActiveModel::Serializer::CollectionSerializer.new(
