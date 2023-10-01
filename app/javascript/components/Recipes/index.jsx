@@ -40,12 +40,18 @@ const Recipes = () => {
             <strong>Ratings:</strong> {recipe.ratings} stars
           </p>
           <p className="card-text">
-            <strong>Cuisine:</strong> {recipe.cuisine}
+            <strong>Cuisine:</strong> {recipe.cuisine || "-"}
           </p>
-
-          <Link to="#" className="btn custom-button">
-            View Recipe
-          </Link>
+          <p className="card-text">
+            <strong>Ingredients:</strong>
+            <ul>
+              {recipe.ingredients.map((ingredient, index) => (
+                <li key={index}>
+                  {ingredient.quantity} {ingredient.name}
+                </li>
+              ))}
+            </ul>
+          </p>
         </div>
       </div>
     </div>
