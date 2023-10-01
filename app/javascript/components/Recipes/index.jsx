@@ -1,47 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import RecipeSearch from "../RecipeSearch";
 
 const Recipes = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [keyphrase, setKeyphrase] = useState("");
 
-  useEffect(() => {
-    const url = `/api/v1/recipes/index?page=${currentPage}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setRecipes(data.recipes);
-        setCurrentPage(data.meta.currentPage);
-        setTotalPages(data.meta.totalPages);
-      })
-      .catch(() => navigate("/"));
-  }, [currentPage]);
+  const handleSearch = (keyphrase) => {
+    setKeyphrase(keyphrase);
+    setCurrentPage(1); // Reset to the first page for a new search
+  };
 
-  const allRecipes = recipes.map((recipe, index) => (
-    <div key={index} className="col-md-6 col-lg-3">
+  const allRecipes = recipes.map((recipe) => (
+    <div key={recipe.id} className="col-md-6 col-lg-3">
       <div className="card mb-4">
         <img
           src={recipe.imageUrl}
           className="card-img-top"
           alt={`${recipe.title} image`}
+          style={{ width: "100%", height: "200px", objectFit: "cover" }}
         />
         <div className="card-body">
           <h5 className="card-title">{recipe.title}</h5>
-
+          <hr />
           <p className="card-text">
-            <strong>Prep Time:</strong> {recipe.prepTimeInMinutes} minutes
+            <strong>Prep Time:</strong> {recipe.prepTimeInMinutes}'
           </p>
           <p className="card-text">
-            <strong>Cook Time:</strong> {recipe.cookTimeInMinutes} minutes
+            <strong>Cook Time:</strong> {recipe.cookTimeInMinutes}'
           </p>
           <p className="card-text">
-            <strong>Ratings:</strong> {recipe.ratings} stars
+            <strong>Ratings:</strong> {recipe.ratings} ⭐
           </p>
           <p className="card-text">
-            <strong>Cuisine:</strong> {recipe.cuisine || "-"}
+            <strong>Category:</strong> {recipe.category || "-"}
           </p>
+          <hr />
           <p className="card-text">
             <strong>Ingredients:</strong>
             <ul>
@@ -59,9 +56,25 @@ const Recipes = () => {
 
   const noRecipes = (
     <div className="vw-100 vh-50 d-flex align-items-center justify-content-center">
-      <h4>Unfortunately, our chefs are on vacation; No recipes found!</h4>
+      <h4>Oops, our chefs are on vacation; No recipes found!</h4>
     </div>
   );
+
+  useEffect(() => {
+    let url = `/api/v1/recipes/index?page=${currentPage}`;
+    if (keyphrase) {
+      url += `&keyphrase=${keyphrase}`;
+    }
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setRecipes(data.recipes);
+        setCurrentPage(data.meta.currentPage);
+        setTotalPages(data.meta.totalPages);
+      })
+      .catch(() => navigate("/recipes"));
+  }, [currentPage, keyphrase]);
 
   return (
     <>
@@ -71,6 +84,7 @@ const Recipes = () => {
           <p className="lead">
             Search for your favourite recipes in our ever growing catalogue!
           </p>
+          <RecipeSearch onSearch={handleSearch} />
         </div>
       </section>
       <div className="py-5">
