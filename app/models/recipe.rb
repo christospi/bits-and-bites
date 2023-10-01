@@ -1,4 +1,7 @@
 class Recipe < ApplicationRecord
+  has_many :recipe_ingredients, dependent: :destroy
+  has_many :ingredients, through: :recipe_ingredients
+
   validates :title, presence: true
   # Hopefully, you will not need more than a day to cook or prep a recipe.
   validates :cook_time_in_minutes, numericality: { in: 1..1440 }
