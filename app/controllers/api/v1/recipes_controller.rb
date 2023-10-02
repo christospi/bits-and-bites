@@ -18,10 +18,7 @@ class Api::V1::RecipesController < ApplicationController
         @recipes,
         each_serializer: RecipeSerializer
       ),
-      meta: {
-        total_pages: @recipes.total_pages,
-        current_page: @recipes.current_page
-      }
+      meta: { total_pages: @recipes.total_pages }
     }
   end
 

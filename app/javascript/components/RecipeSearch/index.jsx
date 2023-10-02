@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 function RecipeSearch({ onSearch }) {
-  const [keyphrase, setKeyphrase] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [keyphrase, setKeyphrase] = useState(
+    searchParams.get("keyphrase") || "",
+  );
 
   const handleSearch = () => {
     onSearch(keyphrase);
@@ -18,7 +22,6 @@ function RecipeSearch({ onSearch }) {
               value={keyphrase}
               onChange={(e) => setKeyphrase(e.target.value)}
               placeholder="Enter ingredients, separated by commas"
-              required
             />
             <div className="input-group-append">
               <button

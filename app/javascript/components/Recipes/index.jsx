@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import RecipeSearch from "../RecipeSearch";
 
 const Recipes = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [keyphrase, setKeyphrase] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleSearch = (keyphrase) => {
-    setKeyphrase(keyphrase);
-    setCurrentPage(1); // Reset to the first page for a new search
+    setSearchParams(keyphrase ? { keyphrase } : {});
   };
 
   const allRecipes = recipes.map((recipe) => (
@@ -61,20 +59,22 @@ const Recipes = () => {
   );
 
   useEffect(() => {
-    let url = `/api/v1/recipes/index?page=${currentPage}`;
-    if (keyphrase) {
-      url += `&keyphrase=${keyphrase}`;
+    let url = `/api/v1/recipes/index?`;
+    if (searchParams.has("keyphrase")) {
+      url += `&keyphrase=${searchParams.get("keyphrase")}`;
+    }
+    if (searchParams.has("page")) {
+      url += `&page=${searchParams.get("page")}`;
     }
 
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
         setRecipes(data.recipes);
-        setCurrentPage(data.meta.currentPage);
         setTotalPages(data.meta.totalPages);
       })
       .catch(() => navigate("/recipes"));
-  }, [currentPage, keyphrase]);
+  }, [searchParams]);
 
   return (
     <>
@@ -98,23 +98,36 @@ const Recipes = () => {
         <button
           className="btn btn-secondary btn-sm"
           onClick={() =>
-            setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+            setSearchParams((prevParams) => ({
+              ...prevParams,
+              page: Math.max(Number(prevParams.get("page")) - 1, 1),
+            }))
           }
-          disabled={currentPage === 1}
+          disabled={
+            searchParams.get("page") === "1" || !searchParams.has("page")
+          }
         >
           Previous
         </button>
 
         <span className="mx-3">
-          Page {currentPage} of {totalPages}
+          Page {searchParams.get("page") || 1} of {totalPages}
         </span>
 
         <button
           className="btn btn-secondary btn-sm"
           onClick={() =>
-            setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
+            setSearchParams((prevParams) => ({
+              ...prevParams,
+              page: Math.min(
+                Number(prevParams.get("page") || "1") + 1,
+                totalPages,
+              ).toString(),
+            }))
           }
-          disabled={currentPage === totalPages}
+          disabled={
+            searchParams.get("page") === totalPages.toString() || totalPages < 2
+          }
         >
           Next
         </button>
