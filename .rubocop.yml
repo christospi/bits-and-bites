@@ -80,3 +80,6 @@ RSpec/ExampleLength:
 
 RSpec/NestedGroups:
   Max: 5
+
+Rspec/MultipleMemoizedHelpers:
+  Enabled: false

@@ -1,27 +1,40 @@
 class RecipeSearchService
   # @param keyphrase [String] comma-separated list of ingredients
   def initialize(keyphrase)
-    @ingredients = keyphrase.split(',').map(&:strip).map(&:downcase)
+    @ingredients = parse_ingredients(keyphrase)
   end
 
-  # Searches for recipes that include all of the provided ingredients.
+  # Searches for recipes that can be made with the specified ingredients.
+  # A recipe is considered a match if:
+  # * it has ALL the specified ingredients but no more
+  # * it has LESS than the specified ingredients
   #
   # @return [ActiveRecord::Relation] the matching recipes (or none)
   def call
     return Recipe.none if @ingredients.blank?
 
-    # Get IDs of recipes that have the ALL the specified ingredients
-    # (but we don't know if they have more ingredients than that)
-    matching_recipes = Recipe.joins(:ingredients).
-                             where(ingredients: { name: @ingredients }).
-                             group('recipes.id').
-                             having('COUNT(DISTINCT ingredients.id) = ?', @ingredients.count).
-                             pluck(:id)
+    # Get the recipes that have ingredients other than the specified ones.
+    # Notes:
+    # (1) We use RecipeIngredient directly to avoid an extra query, since
+    # we only need the recipe_id and the ingredient name.
+    # (2) Also, we do not materialize the ActiveRecord objects to let the DB do
+    # the heavy lifting with nested query.
+    not_matching_recipes = RecipeIngredient.joins(:ingredient).
+      where.not(ingredients: { name: @ingredients }).
+      distinct.select('recipe_id')
 
-    # From those IDs, filter further to ensure they have ONLY the specified ingredients
-    Recipe.joins(:ingredients).
-          where(id: matching_recipes).
-          group('recipes.id').
-          having('COUNT(DISTINCT ingredients.id) = ?', @ingredients.count)
+    # The recipes that all their ingredients are included in the specified ones.
+    Recipe.where.not(id: not_matching_recipes)
+  end
+
+  private
+
+  # Converts a comma-separated list of ingredients into an array of unique
+  # ingredients.
+  #
+  # @param keyphrase [String] comma-separated list of ingredients
+  # @return [Array<String>] the unique ingredients
+  def parse_ingredients(keyphrase)
+    keyphrase.split(',').map(&:strip).map(&:downcase).compact_blank.uniq
   end
 end
