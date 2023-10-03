@@ -4,10 +4,26 @@ namespace :recipes do
     file_path = args[:file_path]
 
     unless File.exist?(file_path) && File.extname(file_path) == '.json'
-      puts 'Invalid input file! Please provide a valid JSON file.'
+      puts 'Invalid input file, please provide a valid JSON file.'
       exit
     end
 
+    import_recipes(file_path)
+  end
+
+  desc 'Import the whole recipes dataset'
+  task import_all: :environment do
+    import_recipes(Rails.root.join('db/dataset/recipes-en.json'))
+  end
+
+  desc 'Import a small subset of the recipes dataset'
+  task import_small: :environment do
+    import_recipes(Rails.root.join('db/dataset/recipes-en-small.json'))
+  end
+
+  private
+
+  def import_recipes(file_path)
     begin
       # Parse the JSON file
       file_content = File.read(file_path)
@@ -18,6 +34,11 @@ namespace :recipes do
     end
 
     successful_imports = 0
+    pb = ProgressBar.create(
+      title: 'Importing recipes',
+      total: recipes_data.count,
+      format: '%t: |%B| %p%% (%c/%C) %e'
+    )
 
     # Process each recipe from the parsed data
     recipes_data.each do |recipe_data|
@@ -35,7 +56,9 @@ namespace :recipes do
         )
 
         # Process each ingredient of the current recipe
-        parse_ingredients(recipe_data['ingredients']).each do |quantity, ingredient_name|
+        recipe_data['ingredients'].each do |ingredient|
+          quantity, ingredient_name = parsed_ingredients(ingredient)
+
           # Downcase to avoid duplicates
           ingredient_name = ingredient_name.downcase
 
@@ -49,14 +72,24 @@ namespace :recipes do
       rescue ActiveRecord::RecordInvalid => e
         puts "Error creating recipe: #{e.message}"
         raise ActiveRecord::Rollback
+      ensure
+        pb.increment
       end
     end
 
+    pb.finish
     puts "Successfully imported #{successful_imports}/#{recipes_data.count} recipes!"
   end
 
-  def parse_ingredients(ingredients_desc)
-    parsed_ingredients = []
+  # Uses a regex to parse an ingredient description into its name and quantity.
+  # The regex is based on a few examples (and some chef guessing).
+  #
+  # @param ingredient_desc [String] the original ingredient description
+  # @return [Array<String>] ingredient name, quantity (or nil if not found)
+  def parsed_ingredients(ingredient_desc)
+    @parsed_ingredients ||= {}
+
+    return @parsed_ingredients[ingredient_desc] if @parsed_ingredients.key?(ingredient_desc)
 
     # Best effort regex, based on a few examples (and some chef guessing)
     pattern = %r{
@@ -65,21 +98,18 @@ namespace :recipes do
       (.+)$
     }x
 
-    ingredients_desc.each do |ingredient|
-      match = ingredient.strip.match(pattern)
-      if match
-        parsed_ingredients << [
-          match[1].strip,
-          match[2].strip
-        ]
-      else
-        parsed_ingredients << [
-          nil,
-          ingredient.strip
-        ]
-      end
-    end
+    match = ingredient_desc.strip.match(pattern)
 
-    parsed_ingredients
+    if match
+      @parsed_ingredients[ingredient_desc] = [
+        match[1].strip,
+        match[2].strip
+      ]
+    else
+      @parsed_ingredients[ingredient_desc] = [
+        nil,
+        ingredient_desc.strip
+      ]
+    end
   end
 end
