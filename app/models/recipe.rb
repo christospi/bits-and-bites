@@ -1,6 +1,6 @@
 class Recipe < ApplicationRecord
-  has_many :recipe_ingredients, dependent: :destroy
-  has_many :ingredients, through: :recipe_ingredients
+  has_many :recipes_ingredients, dependent: :destroy
+  has_many :ingredients, through: :recipes_ingredients
 
   validates :title, presence: true
   # Hopefully, you will not need more than a day to cook or prep a recipe.
@@ -8,5 +8,5 @@ class Recipe < ApplicationRecord
   validates :prep_time_in_minutes, numericality: { in: 0..1440 }
   validates :ratings, numericality: { in: 0..5 }, allow_nil: true
 
-  scope :includes_ingredients, -> { includes(recipe_ingredients: :ingredient) }
+  scope :includes_ingredients, -> { includes(recipes_ingredients: :ingredient) }
 end

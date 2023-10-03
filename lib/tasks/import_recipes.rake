@@ -65,7 +65,7 @@ namespace :recipes do
           # Find or create the Ingredient record
           ingredient = Ingredient.find_or_create_by!(name: ingredient_name)
 
-          RecipeIngredient.create!(recipe: recipe, ingredient: ingredient, quantity: quantity)
+          RecipesIngredient.create!(recipe: recipe, ingredient: ingredient, quantity: quantity)
         end
 
         successful_imports += 1

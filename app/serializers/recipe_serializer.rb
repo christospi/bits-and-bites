@@ -7,7 +7,7 @@ class RecipeSerializer < ActiveModel::Serializer
   end
 
   def ingredients
-    object.recipe_ingredients.map do |recipe_ingredient|
+    object.recipes_ingredients.map do |recipe_ingredient|
       {
         id: recipe_ingredient.ingredient.id,
         name: recipe_ingredient.ingredient.name,

@@ -15,11 +15,11 @@ class RecipeSearchService
 
     # Get the recipes that have ingredients other than the specified ones.
     # Notes:
-    # (1) We use RecipeIngredient directly to avoid an extra query, since
+    # (1) We use RecipesIngredient directly to avoid an extra query, since
     # we only need the recipe_id and the ingredient name.
     # (2) Also, we do not materialize the ActiveRecord objects to let the DB do
     # the heavy lifting with nested query.
-    not_matching_recipes = RecipeIngredient.joins(:ingredient).
+    not_matching_recipes = RecipesIngredient.joins(:ingredient).
       where.not(ingredients: { name: @ingredients }).
       distinct.select('recipe_id')
 
