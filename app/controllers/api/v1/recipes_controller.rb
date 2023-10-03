@@ -10,7 +10,7 @@ class Api::V1::RecipesController < ApplicationController
       @recipes = Recipe.all
     end
 
-    @recipes = @recipes.includes_ingredients.order(created_at: :desc).
+    @recipes = @recipes.includes_ingredients.order_by_ratings.
       page(valid_params[:page]).per(PAGE_SIZE)
 
     render json: {
