@@ -336,6 +336,7 @@ DEPENDENCIES
   rspec-rails (~> 6.0, >= 6.0.3)
   rubocop-rails (~> 2.21, >= 2.21.1)
   rubocop-rspec (~> 2.24, >= 2.24.1)
+  ruby-progressbar (~> 1.8, >= 1.8.1)
   selenium-webdriver
   shoulda-matchers (~> 5.2)
   sprockets-rails
