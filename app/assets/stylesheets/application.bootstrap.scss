@@ -4,6 +4,7 @@
 $primary-color: #f1f1f1;
 $secondary-color: #213135;
 $secondary-color-light: #3a585f;
+$secondary-color-lighter: #86b2b7;
 
 .primary-color {
   background-color: $primary-color
@@ -83,7 +84,7 @@ body {
 }
 
 .card {
-  height: 700px;
+  height: 720px;
   overflow-y: auto;
 }
 
@@ -103,4 +104,9 @@ body {
 
 .pagination-controls button {
   margin: 0 10px;
+}
+
+.form-control:focus {
+  border-color: $secondary-color-light;
+  box-shadow: 0 0 0 0.2rem $secondary-color-lighter;
 }
