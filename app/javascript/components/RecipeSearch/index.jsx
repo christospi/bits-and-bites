@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 function RecipeSearch({ onSearch }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,17 +11,23 @@ function RecipeSearch({ onSearch }) {
     onSearch(keyphrase);
   };
 
+  const clearSearch = () => {
+    setKeyphrase("");
+    setSearchParams({ keyphrase: "" });
+  };
+
   return (
     <div className="container mt-3">
       <div className="row justify-content-center">
-        <div className="col-md-8">
+        <div className="col-md-10">
           <div className="input-group">
+            <div className="col-md-1"></div>
             <input
               type="text"
-              className="form-control"
+              className="form-control rounded-start"
               value={keyphrase}
               onChange={(e) => setKeyphrase(e.target.value)}
-              placeholder="Enter ingredients, separated by commas"
+              placeholder="Enter ingredients, comma separated (e.g. chicken, rice, tomato)"
             />
             <div className="input-group-append">
               <button
@@ -30,6 +36,17 @@ function RecipeSearch({ onSearch }) {
               >
                 Search
               </button>
+            </div>
+            <div className="input-group-append col-md-1">
+              {keyphrase && (
+                <Link
+                  to="/recipes"
+                  className="btn btn-outline-secondary"
+                  onClick={clearSearch}
+                >
+                  Clear
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -82,7 +82,7 @@ const Recipes = () => {
         <div className="container py-5">
           <h1 className="display-4">Recipes Catalogue</h1>
           <p className="lead">
-            Search for your favourite recipes in our ever growing catalogue!
+            Search for delicious recipes that you can cook right now!
           </p>
           <RecipeSearch onSearch={handleSearch} />
         </div>
