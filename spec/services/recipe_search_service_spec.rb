@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe RecipeSearchService do
   describe '#call' do
-    subject(:search_result_ids) { described_class.new(ingredients).call.pluck(:id) }
+    subject(:search_result_ids) { described_class.new(keyphrase).call.pluck(:id) }
 
-    let(:ingredients) { 'milk, butter' }
+    let(:keyphrase) { 'milk, butter' }
 
     context 'when there are no recipes' do
       it 'returns no results' do
@@ -51,7 +51,7 @@ RSpec.describe RecipeSearchService do
       end
 
       context 'when an ingredient is specified multiple times' do
-        let(:ingredients) { 'milk, butter, milk' }
+        let(:keyphrase) { 'milk, butter, milk' }
 
         it 'returns the recipe and exactly matches the unique ingredients' do
           expect(search_result_ids).to eq([recipe1.id])
@@ -59,7 +59,7 @@ RSpec.describe RecipeSearchService do
       end
 
       context 'when an empty string is passed' do
-        let(:ingredients) { '' }
+        let(:keyphrase) { '' }
 
         it 'returns no results' do
           expect(search_result_ids).to be_empty
@@ -67,18 +67,30 @@ RSpec.describe RecipeSearchService do
       end
 
       context 'when multiple commas with empty strings are passed' do
-        let(:ingredients) { ',,,' }
+        let(:keyphrase) { ',,,' }
 
         it 'returns no results' do
           expect(search_result_ids).to be_empty
         end
 
         context 'when there are existing ingredients between empty strings' do
-          let(:ingredients) { 'milk,,,butter,,,' }
+          let(:keyphrase) { 'milk,,,butter,,,' }
 
           it 'returns the recipe and exactly matches the ingredients' do
             expect(search_result_ids).to eq([recipe1.id])
           end
+        end
+      end
+
+      context 'when there are ingredients that textually match the search' do
+        let!(:ingredient4) { Ingredient.create(name: 'milk powder') }
+
+        before do
+          recipe1.ingredients = [ingredient2, ingredient4]
+        end
+
+        it 'returns the recipe and exactly matches the ingredients' do
+          expect(search_result_ids).to eq([recipe1.id])
         end
       end
     end
