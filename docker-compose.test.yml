@@ -5,8 +5,19 @@ services:
     image: postgres
     container_name: bits-and-bites-postgres-test
     environment:
-      - POSTGRES_DB=test
+      - POSTGRES_DB=bits_and_bites_test
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
-    ports:
-      - "5435:5432"
+
+  test:
+    build: .
+    command: "bundle exec rspec"
+    volumes:
+      - app-storage:/rails/storage
+    environment:
+      - RAILS_ENV=test
+    depends_on:
+      - test_db
+
+volumes:
+  app-storage: {}
