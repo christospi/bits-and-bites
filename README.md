@@ -2,7 +2,7 @@
 
 ![BitsAndBitesLogo](app/assets/images/bnb.webp)
 
-Available at: <URL>
+Available at: [<URL>](https://bits-and-bites.fly.dev/)
 
 This is a fully-dockerized Rails 7 & React web application that helps you not to starve! 🤤
 You can search for ingredients you have on hand, and BitsAndBites will suggest a myriad of recipes for you to cook using those ingredients.
