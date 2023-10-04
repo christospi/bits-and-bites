@@ -101,6 +101,8 @@ GEM
       irb (>= 1.5.0)
       reline (>= 0.3.1)
     diff-lcs (1.5.0)
+    dockerfile-rails (1.5.10)
+      rails (>= 3.0.0)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
@@ -279,6 +281,11 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    sentry-rails (5.11.0)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.11.0)
+    sentry-ruby (5.11.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     shoulda-matchers (5.2.0)
       activesupport (>= 5.2.0)
     sprockets (4.2.1)
@@ -323,6 +330,7 @@ DEPENDENCIES
   capybara
   cssbundling-rails
   debug
+  dockerfile-rails (>= 1.5)
   dotenv-rails (~> 2.8, >= 2.8.1)
   jbuilder
   jsbundling-rails
@@ -342,6 +350,8 @@ DEPENDENCIES
   rubocop-rspec (~> 2.24, >= 2.24.1)
   ruby-progressbar (~> 1.8, >= 1.8.1)
   selenium-webdriver
+  sentry-rails (~> 5.11)
+  sentry-ruby (~> 5.11)
   shoulda-matchers (~> 5.2)
   sprockets-rails
   stimulus-rails
