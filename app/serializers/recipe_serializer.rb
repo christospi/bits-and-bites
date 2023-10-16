@@ -11,8 +11,15 @@ class RecipeSerializer < ActiveModel::Serializer
       {
         id: recipe_ingredient.ingredient.id,
         name: recipe_ingredient.ingredient.name,
-        quantity: recipe_ingredient.quantity
+        quantity: recipe_ingredient.quantity,
+        matched: matched_ingredient_ids.include?(recipe_ingredient.ingredient.id)
       }
-    end
+    end.sort_by { |ingredient| ingredient[:matched] ? 0 : 1 }
+  end
+
+  private
+
+  def matched_ingredient_ids
+    object.try(:matched_ingredient_ids) || []
   end
 end

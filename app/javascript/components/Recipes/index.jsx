@@ -41,7 +41,10 @@ const Recipes = () => {
             <strong>Ingredients:</strong>
             <ul>
               {recipe.ingredients.map((ingredient, index) => (
-                <li key={index}>
+                <li
+                  key={index}
+                  className={ingredient.matched ? "matched-ingredient" : ""}
+                >
                   {ingredient.quantity} {ingredient.name}
                 </li>
               ))}
