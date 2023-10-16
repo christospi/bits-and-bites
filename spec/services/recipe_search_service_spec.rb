@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe RecipeSearchService do
   describe '#call' do
-    subject(:search_result_ids) { described_class.new(keyphrase).call.pluck(:id) }
+    subject(:search_result_ids) { described_class.new(keyphrase).call.map(&:id) }
 
     let(:keyphrase) { 'milk, butter' }
 
@@ -34,27 +34,15 @@ RSpec.describe RecipeSearchService do
         recipe3.ingredients << ingredient3
       end
 
-      it 'returns the recipe that exactly matches the ingredients' do
-        expect(search_result_ids).to eq([recipe1.id])
+      it 'returns the recipes that contain any of the ingredients, sorted by match_score' do
+        expect(search_result_ids).to eq([recipe1.id, recipe2.id, recipe3.id])
       end
 
-      context 'when there is also a recipe with less ingredients' do
-        let!(:recipe4) { Recipe.create(title: 'R4', cook_time_in_minutes: 1, prep_time_in_minutes: 1) }
+      context 'when there are duplicate ingredients' do
+        let(:keyphrase) { 'milk, milk, butter' }
 
-        before do
-          recipe4.ingredients << ingredient1
-        end
-
-        it 'includes the recipe in the results' do
-          expect(search_result_ids).to include(recipe4.id)
-        end
-      end
-
-      context 'when an ingredient is specified multiple times' do
-        let(:keyphrase) { 'milk, butter, milk' }
-
-        it 'returns the recipe and exactly matches the unique ingredients' do
-          expect(search_result_ids).to eq([recipe1.id])
+        it 'returns the recipes that contain any of the ingredients' do
+          expect(search_result_ids).to match_array([recipe1.id, recipe2.id, recipe3.id])
         end
       end
 
@@ -76,8 +64,8 @@ RSpec.describe RecipeSearchService do
         context 'when there are existing ingredients between empty strings' do
           let(:keyphrase) { 'milk,,,butter,,,' }
 
-          it 'returns the recipe and exactly matches the ingredients' do
-            expect(search_result_ids).to eq([recipe1.id])
+          it 'returns the recipes that contain the ingredients' do
+            expect(search_result_ids).to match_array([recipe1.id, recipe2.id, recipe3.id])
           end
         end
       end
@@ -89,8 +77,8 @@ RSpec.describe RecipeSearchService do
           recipe1.ingredients = [ingredient2, ingredient4]
         end
 
-        it 'returns the recipe and exactly matches the ingredients' do
-          expect(search_result_ids).to eq([recipe1.id])
+        it 'returns the recipes that contain the ingredients' do
+          expect(search_result_ids).to match_array([recipe1.id, recipe2.id, recipe3.id])
         end
       end
     end
