@@ -7,10 +7,10 @@ class Api::V1::RecipesController < ApplicationController
     if valid_params[:keyphrase].present?
       @recipes = ::RecipeSearchService.new(valid_params[:keyphrase]).call
     else
-      @recipes = Recipe.all
+      @recipes = Recipe.all.order_by_ratings
     end
 
-    @recipes = @recipes.includes_ingredients.order_by_ratings.
+    @recipes = @recipes.includes_ingredients.
       page(valid_params[:page]).per(PAGE_SIZE)
 
     render json: {

@@ -9,5 +9,5 @@ class Recipe < ApplicationRecord
   validates :ratings, numericality: { in: 0..5 }, allow_nil: true
 
   scope :includes_ingredients, -> { includes(recipes_ingredients: :ingredient) }
-  scope :order_by_ratings, -> { order(ratings: :desc) }
+  scope :order_by_ratings, -> { order(ratings: :desc, id: :desc) }
 end
