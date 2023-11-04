@@ -41,7 +41,10 @@ const Recipes = () => {
             <strong>Ingredients:</strong>
             <ul>
               {recipe.ingredients.map((ingredient, index) => (
-                <li key={index}>
+                <li
+                  key={index}
+                  className={ingredient.matched ? "matched-ingredient" : ""}
+                >
                   {ingredient.quantity} {ingredient.name}
                 </li>
               ))}
@@ -98,10 +101,22 @@ const Recipes = () => {
         <button
           className="btn btn-secondary btn-sm"
           onClick={() =>
-            setSearchParams((prevParams) => ({
-              ...prevParams,
-              page: Math.max(Number(prevParams.get("page")) - 1, 1),
-            }))
+            setSearchParams((prevParams) => {
+              const prevKeyphrase = prevParams.get("keyphrase");
+
+              if (prevKeyphrase) {
+                return {
+                  ...prevParams,
+                  keyphrase: prevKeyphrase,
+                  page: Math.max(Number(prevParams.get("page")) - 1, 1),
+                };
+              } else {
+                return {
+                  ...prevParams,
+                  page: Math.max(Number(prevParams.get("page")) - 1, 1),
+                };
+              }
+            })
           }
           disabled={
             searchParams.get("page") === "1" || !searchParams.has("page")
@@ -117,13 +132,28 @@ const Recipes = () => {
         <button
           className="btn btn-secondary btn-sm"
           onClick={() =>
-            setSearchParams((prevParams) => ({
-              ...prevParams,
-              page: Math.min(
-                Number(prevParams.get("page") || "1") + 1,
-                totalPages,
-              ).toString(),
-            }))
+            setSearchParams((prevParams) => {
+              const prevKeyphrase = prevParams.get("keyphrase");
+
+              if (prevKeyphrase) {
+                return {
+                  ...prevParams,
+                  keyphrase: prevKeyphrase,
+                  page: Math.min(
+                    Number(prevParams.get("page") || "1") + 1,
+                    totalPages,
+                  ),
+                };
+              } else {
+                return {
+                  ...prevParams,
+                  page: Math.min(
+                    Number(prevParams.get("page") || "1") + 1,
+                    totalPages,
+                  ),
+                };
+              }
+            })
           }
           disabled={
             searchParams.get("page") === totalPages.toString() || totalPages < 2

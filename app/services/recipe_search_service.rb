@@ -20,18 +20,21 @@ class RecipeSearchService
       Ingredient.search_by_name(ingredient_name).pluck(:id)
     end.uniq
 
-    # Get the recipes that have ingredients other than the specified ones.
-    # Notes:
-    # (1) We use RecipesIngredient directly to avoid an extra query, since
-    # we only need the recipe_id and the ingredient_id.
-    # (2) Also, we do not materialize the ActiveRecord objects to let the DB do
-    # the heavy lifting with a nested query.
-    not_matching_recipes = RecipesIngredient.
-      where.not(ingredient_id: matched_ingredient_ids).
-      distinct.select('recipe_id')
+    # Match-score is the ratio of matched ingredients to the total ingredients of the recipe
+    # TODO: Optimize by caching the total ingredients count in the recipes table
+    match_score_sql = Arel.sql(
+      'COUNT(DISTINCT recipes_ingredients.ingredient_id) * 1.0 /
+      (SELECT COUNT(*) FROM recipes_ingredients ri WHERE ri.recipe_id = recipes.id)'
+    )
 
-    # The recipes that all their ingredients are included in the specified ones.
-    Recipe.where.not(id: not_matching_recipes)
+    # Find recipes that include the matched ingredients, and order them by:
+    # * match-score (the higher the better)
+    # * number of recipe ingredients (the lower the better)
+    Recipe.joins(:recipes_ingredients).
+      where(recipes_ingredients: { ingredient_id: matched_ingredient_ids }).
+      group('recipes.id').
+      select('recipes.*', 'ARRAY_AGG(recipes_ingredients.ingredient_id) AS matched_ingredient_ids', match_score_sql.as('match_score')).
+      order(Arel.sql('match_score DESC, COUNT(DISTINCT recipes_ingredients.ingredient_id) ASC, recipes.id ASC'))
   end
 
   private

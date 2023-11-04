@@ -5,6 +5,7 @@ $primary-color: #f1f1f1;
 $secondary-color: #213135;
 $secondary-color-light: #3a585f;
 $secondary-color-lighter: #86b2b7;
+$color-success: #39ae7f;
 
 .primary-color {
   background-color: $primary-color
@@ -103,6 +104,10 @@ body {
 .card-text ul {
   max-height: 150px;
   overflow-y: auto;
+}
+
+.matched-ingredient {
+  color: $color-success;
 }
 
 .pagination-controls {

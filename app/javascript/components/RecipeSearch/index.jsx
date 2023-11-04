@@ -27,6 +27,11 @@ function RecipeSearch({ onSearch }) {
               className="form-control rounded-start"
               value={keyphrase}
               onChange={(e) => setKeyphrase(e.target.value)}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
               placeholder="Enter ingredients, comma separated (e.g. chicken, rice, tomato)"
             />
             <div className="input-group-append">
